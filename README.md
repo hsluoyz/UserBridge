@@ -54,3 +54,11 @@ If the bridging succeeds, you will see a lot of lines coming up in the prompt li
 ```
 
 All these lines show the traffic flow handled by the bridge. Line ``Len: 142`` means there's a packet with 142 bytes is handled.
+
+# How to make a bridge?
+If you want all received traffic on ``Adapter A`` seems like to be received on ``Adapter B``, and all traffic sent out from ``Adapter B`` to be actually sent out from ``Adapter A``, you can realize this by using ``UserBridge`` and ``Npcap``. You need to do two steps:
+
+1. Specify ``Adapter B`` as a ``Send-to-Rx`` adapter in ``Npcap`` (see [v0.05-r6](https://github.com/nmap/npcap/releases/tag/v0.05-r6) and [v0.05-r7](https://github.com/nmap/npcap/releases/tag/v0.05-r7) for details).
+2. Specify ``Adapter A`` as the first interface and ``Adapter B`` as the second interface in ``UserBridge``.
+
+
