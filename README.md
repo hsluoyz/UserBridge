@@ -58,7 +58,12 @@ All these lines show the traffic flow handled by the bridge. Line ``Len: 142`` m
 # How to make a bridge?
 If you want all received traffic on ``Adapter A`` seems like to be received on ``Adapter B``, and all traffic sent out from ``Adapter B`` to be actually sent out from ``Adapter A``, you can realize this by using ``UserBridge`` and ``Npcap``. You need to do two steps:
 
-1. Specify ``Adapter B`` as a ``Send-to-Rx`` adapter in ``Npcap`` (see [v0.05-r6](https://github.com/nmap/npcap/releases/tag/v0.05-r6) and [v0.05-r7](https://github.com/nmap/npcap/releases/tag/v0.05-r7) for details).
+1. Specify ``Adapter B`` as a ``Send-to-Rx`` adapter in ``Npcap`` (see [v0.05-r6](https://github.com/nmap/npcap/releases/tag/v0.05-r6) and [v0.05-r7](https://github.com/nmap/npcap/releases/tag/v0.05-r7) for ``Send-to-Rx``'s details).
 2. Specify ``Adapter A`` as the first interface and ``Adapter B`` as the second interface in ``UserBridge``.
 
+# How to make a firewall?
+If you want all received traffic on ``Adapter A`` get filtered by ``UserBridge``, and drop the packets you don't want like a firewall. You need to do two steps:
+
+1. Specify ``Adapter A`` as both a ``Block-Rx`` and a ``Send-to-Rx`` adapter in ``Npcap`` (see [v0.05-r11](https://github.com/nmap/npcap/releases/tag/v0.05-r11) for ``Block-Rx``'s details).
+2. Specify ``Adapter A`` as both the first interface and second interface in ``UserBridge``.
 
