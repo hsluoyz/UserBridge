@@ -127,7 +127,7 @@ int main()
 	}
 
 	/* Get the second interface number*/
-	printf("Enter the number of the first interface to use (1-%d):",i);
+	printf("Enter the number of the second interface to use (1-%d):",i);
 	scanf("%d", &inum2);
 	
 	if(inum2 < 1 || inum2 > i)
