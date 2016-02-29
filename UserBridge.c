@@ -110,7 +110,7 @@ int main()
 		}
 
 		data_link_type = pcap_datalink(adhandle1);
-		printf("%d. (link type=%d) ", ++i, data_link_type);
+		printf("%d. (link type=%d, flags=%d) ", ++i, data_link_type, d->flags);
 		if (d->description)
 			printf("%s\n", d->description);
 		else
