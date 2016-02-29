@@ -71,6 +71,7 @@ int main()
 	pcap_if_t *d;
 	int inum1, inum2;
 	int i=0;
+	int data_link_type = -1;
 	pcap_t *adhandle1, *adhandle2;
 	char errbuf[PCAP_ERRBUF_SIZE];
 	u_int netmask1, netmask2;
@@ -91,7 +92,25 @@ int main()
 	/* Print the list */
 	for(d=alldevs; d; d=d->next)
 	{
-		printf("%d. ", ++i);
+		if ((adhandle1 = pcap_open(d->name,						// name of the device
+			65536,							// portion of the packet to capture. 
+			// 65536 grants that the whole packet will be captured on every link layer.
+			PCAP_OPENFLAG_PROMISCUOUS |	// flags. We specify that we don't want to capture loopback packets, and that the driver should deliver us the packets as fast as possible
+			PCAP_OPENFLAG_NOCAPTURE_LOCAL |
+			PCAP_OPENFLAG_MAX_RESPONSIVENESS,
+			500,							// read timeout
+			NULL,							// remote authentication
+			errbuf							// error buffer
+			)) == NULL)
+		{
+			fprintf(stderr, "\nUnable to open the adapter. %s is not supported by WinPcap\n", d->description);
+			/* Free the device list */
+			pcap_freealldevs(alldevs);
+			return -1;
+		}
+
+		data_link_type = pcap_datalink(adhandle1);
+		printf("%d. (link type=%d) ", ++i, data_link_type);
 		if (d->description)
 			printf("%s\n", d->description);
 		else
