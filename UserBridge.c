@@ -62,6 +62,7 @@ HANDLE threads[2];
 /* This global variable tells the forwarder threads they must terminate */
 volatile int kill_forwaders = 0;
 
+typedef char* (__cdecl *MY_PCAP_GET_SERVICENAME) ();
 
 /*******************************************************************/
 
@@ -78,6 +79,38 @@ int main()
 	char packet_filter[256];
 	struct bpf_program fcode;
 	in_out_adapters couple0, couple1;
+
+	HINSTANCE hinstLib;
+	// Get a handle to the wpcap DLL module.
+	hinstLib = LoadLibrary(TEXT("wpcap.dll"));
+	MY_PCAP_GET_SERVICENAME pcap_get_servicename;
+	char *servicename_buf;
+
+	// If the handle is valid, try to get the function address.  
+	if (hinstLib != NULL)
+	{
+		pcap_get_servicename = (MY_PCAP_GET_SERVICENAME)GetProcAddress(hinstLib, "pcap_get_servicename");
+		// If the function address is valid, call the function.  
+
+		if (pcap_get_servicename != NULL)
+		{
+			printf("Notice: You are using Npcap.\n");
+			servicename_buf = pcap_get_servicename();
+			// servicename_buf = "NPF" or "NPCAP"
+			printf("Npcap service name: %s\n", servicename_buf);
+		}
+		else
+		{
+			printf("Notice: You are using WinPcap.\n");
+		}
+
+		// Free the DLL module.  
+		FreeLibrary(hinstLib);
+	}
+	else
+	{
+		printf("Notice: Neither Npcap nor WinPcap is installed.\n");
+	}
 
 	/* 
 	 * Retrieve the device list 
@@ -185,7 +218,7 @@ int main()
 	 *	  at the cost of higher CPU usage.
 	 */
 	if((adhandle1 = pcap_open(d->name,						// name of the device
-							 65536,							// portion of the packet to capture. 
+							 11,							// portion of the packet to capture. 
 															// 65536 grants that the whole packet will be captured on every link layer.
 							 PCAP_OPENFLAG_PROMISCUOUS |	// flags. We specify that we don't want to capture loopback packets, and that the driver should deliver us the packets as fast as possible
 							 PCAP_OPENFLAG_NOCAPTURE_LOCAL |
@@ -217,7 +250,7 @@ int main()
 	
 	/* Open the second adapter */
 	if((adhandle2 = pcap_open(d->name,						// name of the device
-							 65536,							// portion of the packet to capture. 
+							 11,							// portion of the packet to capture. 
 															// 65536 grants that the whole packet will be captured on every link layer.
 							 PCAP_OPENFLAG_PROMISCUOUS |	// flags. We specify that we don't want to capture loopback packets, and that the driver should deliver us the packets as fast as possible
 							 PCAP_OPENFLAG_NOCAPTURE_LOCAL |
